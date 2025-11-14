@@ -1,7 +1,7 @@
 # Проект «Большое путешествие»
 
 * Студент: [Vadim Voronin](https://up.htmlacademy.ru/ecmascript-individual/2/user/2653979).
-* Наставник: `Неизвестно`.
+* Наставник: [Сергей Андреев](https://htmlacademy.ru/profile/id812127).
 
 ---
 
