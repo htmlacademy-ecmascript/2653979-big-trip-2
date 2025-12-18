@@ -36,12 +36,8 @@ function convertDate(startDate, endDate) {
     return '';
   }
 
-  const startTime = dayjs(startDate).format('HH:mm');
-  const endTime = dayjs(endDate).format('HH:mm');
-
   const duration = formatDuration(startDate, endDate);
-
-  return `${startTime} — ${endTime} (${duration})`;
+  return `${duration}`;
 }
 function formatDate(dateString) {
   const date = new Date(dateString);
@@ -55,4 +51,8 @@ function formatDate(dateString) {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-export { getRandomArrayElement, getRandomNumber, convertDate, formatDate };
+function rewriteCamelCase(string) {
+  return string.replace(/([A-Z])/g, '-$1').toLowerCase();
+}
+
+export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, rewriteCamelCase };

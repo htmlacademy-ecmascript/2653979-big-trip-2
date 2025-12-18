@@ -1,6 +1,6 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 import { ALL_TYPES } from '../const.js';
-import { formatDate } from '../utils.js';
+import { formatDate, rewriteCamelCase } from '../utils.js';
 
 function createEventFormTemplate(point) {
   const { offer, basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, allDestinations } = point;
@@ -16,7 +16,7 @@ function createEventFormTemplate(point) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event ${type} icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${rewriteCamelCase(type)}.png" alt="Event ${type} icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -128,23 +128,24 @@ function createOffersListTemplate(allOffers, selectedOfferIds) {
   }).join('');
 }
 
-export default class EventFormView {
+export default class EventFormView extends AbstractView {
+  #point = [];
+  #handleClick = null;
+  #clickHandler = (evt) => {
+    evt.preventDefault();
+    this.#handleClick();
+  };
+
   constructor(pointData) {
-    this.point = pointData;
+    super();
+    this.#point = pointData;
+    this.#handleClick = pointData.onClick;
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#clickHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
   }
 
-  getTemplate() {
-    return createEventFormTemplate(this.point);
-  }
+  get template() {
 
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
+    return createEventFormTemplate(this.#point);
   }
 }

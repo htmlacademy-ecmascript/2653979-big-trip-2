@@ -1,4 +1,4 @@
-import { createElement } from '../render.js';
+import AbstractView from '../framework/view/abstract-view';
 
 function createListFiltersTemplate() {
   return `
@@ -28,20 +28,8 @@ function createListFiltersTemplate() {
               `;
 }
 
-export default class ListControlView {
-  getTemplate() {
+export default class ListControlView extends AbstractView {
+  get template() {
     return createListFiltersTemplate();
   }
-
-  getElement() {
-    if (!this.element) {
-      this.element = createElement(this.getTemplate());
-    }
-    return this.element;
-  }
-
-  removeElement() {
-    this.element = null;
-  }
-
 }
