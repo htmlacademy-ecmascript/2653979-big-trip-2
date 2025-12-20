@@ -51,8 +51,8 @@ function formatDate(dateString) {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-function rewriteCamelCase(string) {
+function CamelCaseToKebabCase(string) {
   return string.replace(/([A-Z])/g, '-$1').toLowerCase();
 }
 
-export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, rewriteCamelCase };
+export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase };

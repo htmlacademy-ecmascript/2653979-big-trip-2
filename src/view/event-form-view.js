@@ -1,13 +1,10 @@
 import AbstractView from '../framework/view/abstract-view';
 import { ALL_TYPES } from '../const.js';
-import { formatDate, rewriteCamelCase } from '../utils.js';
+import { formatDate } from '../utils.js';
 
 function createEventFormTemplate(point) {
   const { offer, basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, allDestinations } = point;
   const destination = allDestinations.find((dest) => dest.id === point.destination);
-
-  const allOffers = offer.offers || [];
-  const selectedOffers = selectedOfferIds || [];
 
   return `
     <li class="trip-events__item">
@@ -16,7 +13,7 @@ function createEventFormTemplate(point) {
           <div class="event__type-wrapper">
             <label class="event__type  event__type-btn" for="event-type-toggle-1">
               <span class="visually-hidden">Choose event type</span>
-              <img class="event__type-icon" width="17" height="17" src="img/icons/${rewriteCamelCase(type)}.png" alt="Event ${type} icon">
+              <img class="event__type-icon" width="17" height="17" src="img/icons/${type}.png" alt="Event ${type} icon">
             </label>
             <input class="event__type-toggle  visually-hidden" id="event-type-toggle-1" type="checkbox">
 
@@ -61,11 +58,11 @@ function createEventFormTemplate(point) {
           </button>
         </header>
         <section class="event__details">
-          ${allOffers.length > 0 ? `
+          ${offer.offers.length > 0 ? `
             <section class="event__section  event__section--offers">
               <h3 class="event__section-title  event__section-title--offers">Offers</h3>
               <div class="event__available-offers">
-                ${createOffersListTemplate(allOffers, selectedOffers)}
+                ${createOffersListTemplate(offer.offers, selectedOfferIds)}
               </div>
             </section>
           ` : ''}
@@ -129,23 +126,23 @@ function createOffersListTemplate(allOffers, selectedOfferIds) {
 }
 
 export default class EventFormView extends AbstractView {
-  #point = [];
+  #points = [];
   #handleClick = null;
-  #clickHandler = (evt) => {
+  #closeFormHandler = (evt) => {
     evt.preventDefault();
     this.#handleClick();
   };
 
-  constructor(pointData) {
+  constructor(pointData, events) {
     super();
-    this.#point = pointData;
-    this.#handleClick = pointData.onClick;
-    this.element.querySelector('.event__save-btn').addEventListener('click', this.#clickHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#clickHandler);
+    this.#points = pointData;
+    this.#handleClick = events.onClick;
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#closeFormHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormHandler);
   }
 
   get template() {
 
-    return createEventFormTemplate(this.#point);
+    return createEventFormTemplate(this.#points);
   }
 }

@@ -1,17 +1,16 @@
-
 import EventFormView from '../view/event-form-view.js';
 import EventItemView from '../view/event-item-view.js';
 import { render, replace } from '../framework/render.js';
 
 export default class PointPresenter {
-  #point = null;
-  #destinations = null;
+  #points = [];
+  #destinations = [];
   #container = null;
   #eventItemComponent = null;
   #eventFormComponent = null;
 
   constructor({ point, destinations, container }) {
-    this.#point = point;
+    this.#points = point;
     this.#destinations = destinations;
     this.#container = container;
   }
@@ -26,11 +25,11 @@ export default class PointPresenter {
     window.removeEventListener('keydown', this.#escKeyDownHandler);
   }
 
-  #handleItemClick = () => {
+  #handleOpenFormClick = () => {
     this.#replaceItemToForm();
   };
 
-  #handleFormClick = () => {
+  #handleCloseFormClick = () => {
     this.#replaceFormToItem();
   };
 
@@ -44,16 +43,22 @@ export default class PointPresenter {
 
   init() {
     this.#eventItemComponent = new EventItemView({
-      ...this.#point,
+      ...this.#points,
       allDestinations: this.#destinations,
-      onClick: this.#handleItemClick,
-    });
+    },
+    {
+      onClick: this.#handleOpenFormClick,
+    }
+    );
 
     this.#eventFormComponent = new EventFormView({
-      ...this.#point,
+      ...this.#points,
       allDestinations: this.#destinations,
-      onClick: this.#handleFormClick,
-    });
+    },
+    {
+      onClick: this.#handleCloseFormClick,
+    }
+    );
 
     render(this.#eventItemComponent, this.#container);
   }

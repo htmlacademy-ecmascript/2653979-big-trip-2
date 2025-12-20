@@ -1,38 +1,38 @@
 export const TYPES = {
-  taxi: [
+  'taxi': [
     { title: 'Upgrade to a business class', price: 120, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e04' },
     { title: 'Child seat', price: 30, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e05' },
     { title: 'Order a taxi', price: 50, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e06' },
   ],
-  bus: [
+  'bus': [
     { title: 'Extra baggage', price: 25, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e07' },
     { title: 'Travel by express bus', price: 80, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e08' },
   ],
-  train: [
+  'train': [
     { title: 'Book a sleeping car', price: 150, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e09' },
     { title: 'Order a meal', price: 45, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e10' },
   ],
-  ship: [
+  'ship': [
     { title: 'Add luggage', price: 90, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e11' },
     { title: 'Switch to comfort class', price: 180, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e12' },
     { title: 'Add meal', price: 25, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e13' },
   ],
-  drive: [
+  'drive': [
     { title: 'Autopilot', price: 90, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e14' },
     { title: 'Switch to comfort class', price: 180, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e05' },
   ],
-  flight: [
+  'flight': [
     { title: 'Upgrade to a business class', price: 90, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e16' },
     { title: 'Switch to comfort class', price: 180, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e17' },
   ],
-  checkIn: [
+  'check-in': [
     { title: 'quick registration', price: 20, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e18' },
   ],
-  sightseeing: [
+  'sightseeing': [
     { title: 'personal guide', price: 20, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e19' },
     { title: 'karting', price: 20, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e20' },
   ],
-  restaurant: [
+  'restaurant': [
     { title: 'Everything is included', price: 20, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e21' },
     { title: 'premium place', price: 50, id: 'bfa5cb75-a1fe-4b77-a83c-0e528e910e22' },
   ],
@@ -63,4 +63,4 @@ export const PRICE = {
   MAX: 2000,
 };
 
-export const POINT_COUNT = 1;
+export const POINT_COUNT = 3;

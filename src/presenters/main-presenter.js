@@ -1,6 +1,6 @@
-import ListFiltersView from '../view/filters-view.js';
+import ListFiltersView from '../view/list-filters-view.js';
 import ListSortView from '../view/list-sort-view.js';
-import ListEventsView from '../view/events-list-view.js';
+import ListEventsView from '../view/list-events-view.js';
 import PointPresenter from '../presenters/point-rpesenter.js';
 
 import { render } from '../framework/render.js';
@@ -8,9 +8,8 @@ import { render } from '../framework/render.js';
 export default class MainPresenter {
   #headerContainer = null;
   #mainContainer = null;
-  #pointModel = null;
-  #eventsComponents;
 
+  #eventsComponents = [];
   #points = [];
   #destinations = [];
   #offers = [];
@@ -19,10 +18,9 @@ export default class MainPresenter {
   constructor({ headerContainer, mainContainer, pointModel }) {
     this.#headerContainer = headerContainer;
     this.#mainContainer = mainContainer;
-    this.#pointModel = pointModel;
-    this.#points = [...this.#pointModel.getPoints()];
-    this.#destinations = [...this.#pointModel.getDestinations()];
-    this.#offers = [...this.#pointModel.getOffers()];
+    this.#points = [...pointModel.getPoints()];
+    this.#destinations = [...pointModel.getDestinations()];
+    this.#offers = [...pointModel.getOffers()];
   }
 
   #renderPoint(point, tripList) {

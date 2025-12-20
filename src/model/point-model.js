@@ -9,7 +9,7 @@ export default class PointModel {
   #offers = [];
 
   constructor() {
-    this.#destinations = Array.from({ length: POINT_COUNT }, () => createDestination(''));
+    this.#destinations = Array.from({ length: POINT_COUNT }, () => createDestination());
     this.#offers = Array.from({ length: POINT_COUNT }, () => createOffer());
     this.#points = this.#destinations.map((destination, index) =>
       createPoint(destination.id, this.#offers[index])
