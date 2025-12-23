@@ -1,7 +1,7 @@
 import { CITIES, DESCRIPTION, IMG_DESCRIPTION } from './const';
 import { getRandomArrayElement, getRandomNumber } from '../utils';
 
-export function createDestination(ID) {
+export function createDestination() {
   const picturesCount = getRandomNumber(0, 5);
   const pictures = [];
   for (let i = 0; i < picturesCount; i++) {
@@ -12,7 +12,7 @@ export function createDestination(ID) {
   }
 
   return {
-    id: ID === '' ? crypto.randomUUID() : ID,
+    id: crypto.randomUUID(),
     description: getRandomArrayElement(DESCRIPTION),
     name: getRandomArrayElement(CITIES),
     pictures: pictures

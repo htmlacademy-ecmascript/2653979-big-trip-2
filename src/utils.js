@@ -1,4 +1,5 @@
 import dayjs from 'dayjs';
+import { FILTER_TYPES } from './const';
 
 function getRandomArrayElement(items) {
   return items[Math.floor(Math.random() * items.length)];
@@ -54,5 +55,40 @@ function formatDate(dateString) {
 function CamelCaseToKebabCase(string) {
   return string.replace(/([A-Z])/g, '-$1').toLowerCase();
 }
+const filter = {
+  [FILTER_TYPES.EVERYTHING]: (points) => points,
 
-export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase };
+  [FILTER_TYPES.FUTURE]: (points) => points.filter((point) => {
+    const pointDateFrom = dayjs(point.dateFrom);
+    const now = dayjs();
+
+    return pointDateFrom.isAfter(now);
+  }),
+
+  [FILTER_TYPES.PAST]: (points) => points.filter((point) => {
+    const pointDateTo = dayjs(point.dateTo);
+    const now = dayjs();
+
+    return pointDateTo.isBefore(now);
+  }),
+
+  [FILTER_TYPES.PRESENT]: (points) => points.filter((point) => {
+    const pointDateFrom = dayjs(point.dateFrom);
+    const pointDateTo = dayjs(point.dateTo);
+    const now = dayjs();
+
+    return (pointDateFrom.isSame(now) || pointDateFrom.isBefore(now)) &&
+      (pointDateTo.isSame(now) || pointDateTo.isAfter(now));
+  }),
+};
+
+function generateFilter(points) {
+  return Object.entries(filter).map(
+    ([filterType, filterPoints]) => ({
+      type: filterType,
+      count: filterPoints(points).length,
+    }),
+  );
+}
+
+export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase, filter, generateFilter };

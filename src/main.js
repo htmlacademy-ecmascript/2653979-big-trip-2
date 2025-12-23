@@ -5,11 +5,11 @@ const pointModel = new PointModel();
 
 const headerElement = document.querySelector('.page-header');
 const mainElement = document.querySelector('.page-main');
-const filtersElement = headerElement.querySelector('.trip-controls__filters');
+const tripMainElement = headerElement.querySelector('.trip-main');
 const eventsElement = mainElement.querySelector('.trip-events');
 
 const mainPresenter = new MainPresenter({
-  headerContainer: filtersElement,
+  headerContainer: tripMainElement,
   mainContainer: eventsElement,
   pointModel,
 });

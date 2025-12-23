@@ -3,15 +3,15 @@ import EventItemView from '../view/event-item-view.js';
 import { render, replace } from '../framework/render.js';
 
 export default class PointPresenter {
-  #points = [];
-  #destinations = [];
+  #point = null;
+  #allDestinations = [];
   #container = null;
   #eventItemComponent = null;
   #eventFormComponent = null;
 
-  constructor({ point, destinations, container }) {
-    this.#points = point;
-    this.#destinations = destinations;
+  constructor({ point, container, allDestinations }) {
+    this.#point = point;
+    this.#allDestinations = allDestinations;
     this.#container = container;
   }
 
@@ -42,22 +42,19 @@ export default class PointPresenter {
   };
 
   init() {
-    this.#eventItemComponent = new EventItemView({
-      ...this.#points,
-      allDestinations: this.#destinations,
-    },
-    {
-      onClick: this.#handleOpenFormClick,
-    }
+    this.#eventItemComponent = new EventItemView(
+      this.#point,
+      {
+        onClick: this.#handleOpenFormClick,
+      }
     );
 
-    this.#eventFormComponent = new EventFormView({
-      ...this.#points,
-      allDestinations: this.#destinations,
-    },
-    {
-      onClick: this.#handleCloseFormClick,
-    }
+    this.#eventFormComponent = new EventFormView(
+      this.#point,
+      {
+        onClick: this.#handleCloseFormClick,
+      },
+      this.#allDestinations
     );
 
     render(this.#eventItemComponent, this.#container);

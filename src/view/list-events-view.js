@@ -8,4 +8,8 @@ export default class ListEventsView extends AbstractView {
   get template() {
     return createListControlsTemplate();
   }
+
+  clearElement() {
+    this.element.innerHTML = '';
+  }
 }

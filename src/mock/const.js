@@ -63,4 +63,4 @@ export const PRICE = {
   MAX: 2000,
 };
 
-export const POINT_COUNT = 3;
+export const POINT_COUNT = 5;
