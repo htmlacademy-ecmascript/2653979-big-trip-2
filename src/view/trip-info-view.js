@@ -11,7 +11,9 @@ function createTripInfoTemplate(points, allDestinations) {
     const { type, offers: selectedOfferIds, basePrice, destination: destinationId } = point;
 
     const destination = allDestinations.find((dest) => dest.id === destinationId);
-    destinationNames.push(destination.name);
+    if (destination.name){
+      destinationNames.push(destination.name);
+    }
 
     totalPrice += basePrice;
     if (selectedOfferIds && selectedOfferIds.length > 0) {

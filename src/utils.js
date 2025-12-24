@@ -91,4 +91,8 @@ function generateFilter(points) {
   );
 }
 
-export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase, filter, generateFilter };
+function updateItem(items, update){
+  return items.map((item) => item.id === update.id ? update : item);
+}
+
+export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase, filter, generateFilter, updateItem };

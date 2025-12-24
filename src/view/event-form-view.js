@@ -27,7 +27,7 @@ function createEventFormTemplate(point, allDestinations) {
             <label class="event__label event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name || ''}" list="destination-list-1">
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${destination.name}" list="destination-list-1">
             <datalist id="destination-list-1">
               ${createDestinationsListTemplate(allDestinations)}
             </datalist>
@@ -98,9 +98,9 @@ function createEventTypesListTemplate(currentType) {
 }
 
 function createDestinationsListTemplate(destinations) {
-  return destinations.map((dest) =>
-    `<option value="${dest.name}"></option>`
-  ).join('') || '';
+  const uniqueNames = [...new Set(destinations.map((dest) => dest.name))];
+
+  return uniqueNames.map((name) => `<option value="${name}"></option>`).join('') || '';
 }
 
 function createOffersListTemplate(allOffers, selectedOfferIds) {
@@ -138,7 +138,7 @@ export default class EventFormView extends AbstractView {
     super();
     this.#point = pointData;
     this.#allDestinations = allDestinations;
-    this.#handleClick = events.onClick;
+    this.#handleClick = events.onCloseClick;
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#closeFormHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormHandler);
   }

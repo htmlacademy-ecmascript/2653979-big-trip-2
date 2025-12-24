@@ -3,8 +3,7 @@ import dayjs from 'dayjs';
 import { convertDate } from '../utils.js';
 
 function createEventTemplate(point) {
-  const { offer, basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination } = point;
-
+  const { offer, basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination, isFavorite} = point;
   return `
     <li class="trip-events__item">
       <div class="event">
@@ -26,7 +25,7 @@ function createEventTemplate(point) {
         </p>
         <h4 class="visually-hidden">Offers:</h4>
         ${createOffers(offer.offers, selectedOfferIds)}
-        <button class="event__favorite-btn" type="button">
+        <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''} " type="button">
           <span class="visually-hidden">Add to favorite</span>
           <svg class="event__favorite-icon" width="28" height="28" viewBox="0 0 28 28">
             <path d="M14 21l-8.22899 4.3262 1.57159-9.1631L.685209 9.67376 9.8855 8.33688 14 0l4.1145 8.33688 9.2003 1.33688-6.6574 6.48934 1.5716 9.1631L14 21z"/>
@@ -66,6 +65,7 @@ function createOffers(allOffers, selectedOfferIds) {
 
 export default class EventItemView extends AbstractView {
   #handleClick = null;
+  #favoriteClick = null;
   #point = null;
 
   #openFormHandler = (evt) => {
@@ -73,11 +73,18 @@ export default class EventItemView extends AbstractView {
     this.#handleClick();
   };
 
+  #favoriteClickHandler = (evt) => {
+    evt.preventDefault();
+    this.#favoriteClick();
+  };
+
   constructor(pointData, events) {
     super();
     this.#point = pointData;
-    this.#handleClick = events.onClick;
+    this.#handleClick = events.onOpenClick;
+    this.#favoriteClick = events.onFavoriteClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#openFormHandler);
+    this.element.querySelector('.event__favorite-btn').addEventListener('click', this.#favoriteClickHandler);
   }
 
   get template() {

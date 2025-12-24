@@ -5,7 +5,7 @@ import PointPresenter from '../presenters/point-rpesenter.js';
 import TripInfoView from '../view/trip-info-view.js';
 
 import { render, replace } from '../framework/render.js';
-import { generateFilter, filter } from '../utils.js';
+import { generateFilter, filter, updateItem } from '../utils.js';
 import { FILTER_TYPES } from '../const.js';
 
 export default class MainPresenter {
@@ -32,15 +32,26 @@ export default class MainPresenter {
     this.#tripFilterElement = this.#headerContainer.querySelector('.trip-controls__filters');
   }
 
+  #handleModeChange = () =>{
+    this.#pointPresenters.forEach((presenter) => presenter.resetView());
+  };
+
   #handleFilterChange = (currentFilter) => {
     this.#currentFilterType = currentFilter;
     const filterPoints = filter[currentFilter](this.#points);
+    this.#pointPresenters.forEach((presenter) => presenter.destroy());
+    this.#pointPresenters.clear();
     this.#eventsComponents.clearElement();
     this.#updateTripInfo(filterPoints);
     const tripList = this.#eventsComponents.element;
     filterPoints.forEach((point) => {
       this.#renderPoint(point, tripList);
     });
+  };
+
+  #handlePointChange = (updatePoint) =>{
+    this.#points = updateItem(this.#points, updatePoint);
+    this.#pointPresenters.get(updatePoint.id).init(updatePoint);
   };
 
   #updateTripInfo(points) {
@@ -66,6 +77,10 @@ export default class MainPresenter {
       },
       allDestinations: this.#destinations,
       container: tripList,
+      events: {
+        onDataChange: this.#handlePointChange,
+        onModeChange: this.#handleModeChange,
+      }
     });
 
     this.#pointPresenters.set(point.id, pointPresenter);
