@@ -5,3 +5,8 @@ export const FILTER_TYPES = {
   PRESENT: 'present',
   PAST: 'past',
 };
+export const SortType = {
+  DAY: 'day',
+  TIME: 'time',
+  PRICE: 'price',
+};

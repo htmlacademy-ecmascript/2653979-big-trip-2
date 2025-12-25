@@ -5,8 +5,8 @@ import PointPresenter from '../presenters/point-rpesenter.js';
 import TripInfoView from '../view/trip-info-view.js';
 
 import { render, replace } from '../framework/render.js';
-import { generateFilter, filter, updateItem } from '../utils.js';
-import { FILTER_TYPES } from '../const.js';
+import { generateFilter, filter, updateItem, sortPointDay, sortPointTime, sortPointPrice } from '../utils.js';
+import { FILTER_TYPES, SortType } from '../const.js';
 
 export default class MainPresenter {
   #headerContainer = null;
@@ -19,8 +19,10 @@ export default class MainPresenter {
   #pointPresenters = new Map();
   #filters = [];
   #currentFilterType = FILTER_TYPES.EVERYTHING;
+  #currentSortType = SortType.PRICE;
   #tripFilterElement = null;
   #tripInfoComponent = null;
+  #sortComponent = null;
 
   constructor({ headerContainer, mainContainer, pointModel }) {
     this.#headerContainer = headerContainer;
@@ -30,29 +32,37 @@ export default class MainPresenter {
     this.#offers = [...pointModel.getOffers()];
     this.#filters = generateFilter(this.#points);
     this.#tripFilterElement = this.#headerContainer.querySelector('.trip-controls__filters');
+    this.#points.sort(sortPointDay);
   }
 
-  #handleModeChange = () =>{
+  #handleModeChange = () => {
     this.#pointPresenters.forEach((presenter) => presenter.resetView());
   };
 
   #handleFilterChange = (currentFilter) => {
     this.#currentFilterType = currentFilter;
-    const filterPoints = filter[currentFilter](this.#points);
+    this.#rerenderPoints();
+  };
+
+  #handlePointChange = (updatePoint) => {
+    this.#points = updateItem(this.#points, updatePoint);
+    this.#pointPresenters.get(updatePoint.id).init(updatePoint);
+    this.#rerenderPoints();
+  };
+
+
+  #rerenderPoints() {
+    const filteredPoints = filter[this.#currentFilterType](this.#points);
+    const sortedPoints = this.#sortPoints(filteredPoints, this.#currentSortType);
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
     this.#eventsComponents.clearElement();
-    this.#updateTripInfo(filterPoints);
     const tripList = this.#eventsComponents.element;
-    filterPoints.forEach((point) => {
+    sortedPoints.forEach((point) => {
       this.#renderPoint(point, tripList);
     });
-  };
-
-  #handlePointChange = (updatePoint) =>{
-    this.#points = updateItem(this.#points, updatePoint);
-    this.#pointPresenters.get(updatePoint.id).init(updatePoint);
-  };
+    this.#updateTripInfo(sortedPoints);
+  }
 
   #updateTripInfo(points) {
     const newTripInfoComponent = new TripInfoView(points, this.#destinations);
@@ -87,19 +97,56 @@ export default class MainPresenter {
     pointPresenter.init();
   }
 
-  #renderPoints(tripList) {
-    this.#points.forEach((point) => {
-      this.#renderPoint(point, tripList);
+  #sortPoints(pointsToSort, sortType) {
+    const sortedPoints = [...pointsToSort];
+
+    switch (sortType) {
+      case SortType.DAY:
+        sortedPoints.sort(sortPointDay);
+        break;
+      case SortType.TIME:
+        sortedPoints.sort(sortPointTime);
+        break;
+      case SortType.PRICE:
+        sortedPoints.sort(sortPointPrice);
+        break;
+      default:
+    }
+
+    return sortedPoints;
+  }
+
+  #handleSortTypeChange = (sortType) => {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+    this.#sortPoint(sortType);
+  };
+
+  #sortPoint(sortType) {
+    if (this.#currentSortType === sortType) {
+      return;
+    }
+
+    this.#currentSortType = sortType;
+    this.#rerenderPoints();
+  }
+
+
+  #renderSort() {
+    this.#sortComponent = new ListSortView({
+      onSortTypeChange: this.#handleSortTypeChange,
     });
+    render(this.#sortComponent, this.#mainContainer);
   }
 
   init() {
-    render(new ListSortView(), this.#mainContainer);
+    this.#renderSort();
     this.#eventsComponents = new ListEventsView();
     render(this.#eventsComponents, this.#mainContainer);
-    this.#renderPoints(this.#eventsComponents.element);
-    this.#updateTripInfo(this.#points);
+    this.#rerenderPoints();
 
     render(new ListFiltersView(this.#filters, this.#currentFilterType, this.#handleFilterChange), this.#tripFilterElement);
   }
+
 }
