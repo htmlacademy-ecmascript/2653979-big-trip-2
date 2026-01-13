@@ -19,7 +19,7 @@ export default class MainPresenter {
   #pointPresenters = new Map();
   #filters = [];
   #currentFilterType = FILTER_TYPES.EVERYTHING;
-  #currentSortType = SortType.PRICE;
+  #currentSortType = SortType.DAY;
   #tripFilterElement = null;
   #tripInfoComponent = null;
   #sortComponent = null;
@@ -32,7 +32,6 @@ export default class MainPresenter {
     this.#offers = [...pointModel.getOffers()];
     this.#filters = generateFilter(this.#points);
     this.#tripFilterElement = this.#headerContainer.querySelector('.trip-controls__filters');
-    this.#points.sort(sortPointDay);
   }
 
   #handleModeChange = () => {
@@ -41,7 +40,7 @@ export default class MainPresenter {
 
   #handleFilterChange = (currentFilter) => {
     this.#currentFilterType = currentFilter;
-    this.#rerenderPoints(this.#currentFilterType);
+    this.#rerenderPoints();
   };
 
   #handlePointChange = (updatePoint) => {
@@ -50,23 +49,47 @@ export default class MainPresenter {
     this.#rerenderPoints();
   };
 
-
   #rerenderPoints() {
     const filteredPoints = filter[this.#currentFilterType](this.#points);
     const sortedPoints = this.#sortPoints(filteredPoints, this.#currentSortType);
+
     this.#pointPresenters.forEach((presenter) => presenter.destroy());
     this.#pointPresenters.clear();
-    this.#eventsComponents.element.remove();
+
+    if (this.#eventsComponents.element) {
+      this.#eventsComponents.element.remove();
+    }
+
     this.#eventsComponents = new ListEventsView();
     render(this.#eventsComponents, this.#mainContainer);
+
     sortedPoints.forEach((point) => {
       this.#renderPoint(point, this.#eventsComponents.element);
     });
+
     this.#updateTripInfo(sortedPoints);
+
+    this.#updateSortComponent();
+  }
+
+  #updateSortComponent() {
+    const prevSortComponent = this.#sortComponent;
+
+    this.#sortComponent = new ListSortView({
+      onSortTypeChange: this.#handleSortTypeChange,
+      currentSortType: this.#currentSortType
+    });
+
+    if (prevSortComponent) {
+      replace(this.#sortComponent, prevSortComponent);
+    } else {
+      render(this.#sortComponent, this.#mainContainer);
+    }
   }
 
   #updateTripInfo(points = this.#points) {
     const newTripInfoComponent = new TripInfoView(points, this.#destinations);
+
     if (this.#tripInfoComponent === null) {
       render(newTripInfoComponent, this.#headerContainer, 'afterbegin');
       this.#tripInfoComponent = newTripInfoComponent;
@@ -87,6 +110,7 @@ export default class MainPresenter {
         destination
       },
       allDestinations: this.#destinations,
+      allOffers: this.#offers,
       container: tripList,
       handlers: {
         onDataChange: this.#handlePointChange,
@@ -110,7 +134,10 @@ export default class MainPresenter {
       case SortType.PRICE:
         sortedPoints.sort(sortPointPrice);
         break;
+      default:
+        break;
     }
+
     return sortedPoints;
   }
 
@@ -118,25 +145,32 @@ export default class MainPresenter {
     if (this.#currentSortType === sortType) {
       return;
     }
+
+    if (!Object.values(SortType).includes(sortType)) {
+      return;
+    }
+
     this.#currentSortType = sortType;
     this.#rerenderPoints();
   };
 
+  init() {
+    this.#renderSort();
+
+    this.#eventsComponents = new ListEventsView();
+    render(this.#eventsComponents, this.#mainContainer);
+    this.#rerenderPoints();
+    render(
+      new ListFiltersView(this.#filters, this.#currentFilterType, this.#handleFilterChange),
+      this.#tripFilterElement
+    );
+  }
 
   #renderSort() {
     this.#sortComponent = new ListSortView({
       onSortTypeChange: this.#handleSortTypeChange,
+      currentSortType: this.#currentSortType
     });
     render(this.#sortComponent, this.#mainContainer);
   }
-
-  init() {
-    this.#renderSort();
-    this.#eventsComponents = new ListEventsView();
-    render(this.#eventsComponents, this.#mainContainer);
-    this.#rerenderPoints();
-
-    render(new ListFiltersView(this.#filters, this.#currentFilterType, this.#handleFilterChange), this.#tripFilterElement);
-  }
-
 }

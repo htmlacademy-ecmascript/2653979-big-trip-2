@@ -10,6 +10,7 @@ const Mode = {
 export default class PointPresenter {
   #point = null;
   #allDestinations = [];
+  #allOffers = [];
   #container = null;
   #eventItemComponent = null;
   #eventFormComponent = null;
@@ -17,23 +18,29 @@ export default class PointPresenter {
   #handleModeChange = null;
   #mode = Mode.DEFAULT;
 
-  constructor({ point, container, allDestinations, handlers }) {
+  constructor({ point, container, allDestinations, allOffers, handlers }) {
     this.#point = point;
     this.#allDestinations = allDestinations;
+    this.#allOffers = allOffers;
     this.#container = container;
     this.#handleDataChange = handlers.onDataChange;
     this.#handleModeChange = handlers.onModeChange;
   }
 
   destroy() {
-    this.#eventItemComponent.element.remove();
-    this.#eventFormComponent.element.remove();
+    if (this.#eventItemComponent) {
+      this.#eventItemComponent.element.remove();
+    }
+    if (this.#eventFormComponent) {
+      this.#eventFormComponent.element.remove();
+    }
     this.#eventItemComponent = null;
     this.#eventFormComponent = null;
   }
 
   resetView() {
     if (this.#mode !== Mode.DEFAULT) {
+      this.#eventFormComponent.reset(this.#point);
       this.#replaceFormToItem();
     }
   }
@@ -75,8 +82,11 @@ export default class PointPresenter {
     }
   };
 
-  init() {
+  #handleFormSubmit = (updatedPoint) => {
+    this.#handleDataChange(updatedPoint);
+  };
 
+  init() {
     let prevEventItemComponent = this.#eventItemComponent;
     let prevEventFormComponent = this.#eventFormComponent;
 
@@ -91,8 +101,10 @@ export default class PointPresenter {
     this.#eventFormComponent = new EventFormView(
       this.#point,
       this.#allDestinations,
+      this.#allOffers,
       {
         onCloseClick: this.#handleCloseFormClick,
+        onFormSubmit: this.#handleFormSubmit,
       }
     );
 

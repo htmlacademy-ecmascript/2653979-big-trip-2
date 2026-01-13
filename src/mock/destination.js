@@ -15,6 +15,6 @@ export function createDestination() {
     id: crypto.randomUUID(),
     description: getRandomArrayElement(DESCRIPTION),
     name: getRandomArrayElement(CITIES),
-    pictures: pictures
+    pictures: pictures,
   };
 }
