@@ -1,6 +1,9 @@
 import AbstractStatefulView from '../framework/view/abstract-stateful-view.js';
 import { ALL_TYPES } from '../const.js';
 import { formatDate } from '../utils.js';
+import flatpickr from 'flatpickr';
+
+import 'flatpickr/dist/flatpickr.min.css';
 
 function createEventFormTemplate(point, allDestinations, allOffers) {
   const { basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination, isOffers, isDescription, isPictures, EventChange } = point;
@@ -136,6 +139,50 @@ export default class EventFormView extends AbstractStatefulView {
   #handleCloseClick = null;
   #allOffers = [];
   #handleFormSubmit = null;
+  #datepickerFrom = null;
+  #datepickerTo = null;
+
+  removeElement() {
+    super.removeElement();
+
+    if (this.#datepickerFrom) {
+      this.#datepickerFrom.destroy();
+      this.#datepickerFrom = null;
+    }
+    if (this.#datepickerTo) {
+      this.#datepickerTo.destroy();
+      this.#datepickerTo = null;
+    }
+  }
+
+  #setDatePickerFrom() {
+    this.#datepickerFrom = flatpickr(
+      this.element.querySelector('#event-start-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateFrom,
+        enableTime: true,
+        onChange: ([userDate]) => {
+          this._state.dateFrom = userDate;
+        },
+      }
+    );
+  }
+
+  #setDateToPicker() {
+    this.#datepickerTo = flatpickr(
+      this.element.querySelector('#event-end-time-1'),
+      {
+        dateFormat: 'd/m/y H:i',
+        defaultDate: this._state.dateTo,
+        minDate: this._state.dateFrom,
+        enableTime: true,
+        onChange: ([userDate]) => {
+          this._state.dateTo = userDate;
+        },
+      }
+    );
+  }
 
   #formSubmitHandler = (evt) => {
     evt.preventDefault();
@@ -173,8 +220,8 @@ export default class EventFormView extends AbstractStatefulView {
     return {
       type: formData.get('event-type'),
       destination: this._state.destination.id,
-      dateFrom: this._state.dateFrom,
-      dateTo: this._state.dateTo,
+      dateFrom: this._state.dateFrom instanceof Object ? this._state.dateFrom.toISOString() : this._state.dateFrom,
+      dateTo: this._state.dateTo instanceof Object ? this._state.dateTo.toISOString() : this._state.dateTo,
       basePrice: parseInt(formData.get('event-price'), 10) || this._state.basePrice,
       offers: selectedOffers,
       isFavorite: this._state.isFavorite,
@@ -278,12 +325,14 @@ export default class EventFormView extends AbstractStatefulView {
   }
 
   _restoreHandlers() {
+
     this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
-    this.element.querySelector('.event__save-btn').addEventListener('click', this.#closeFormHandler);
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormHandler);
     this.element.querySelector('.event__type-group').addEventListener('click', this.#changeEventHandler);
     this.element.querySelector('.event__input--destination').addEventListener('input', this.#changeDestinationPointHandler);
     this.element.querySelector('.event__input--price').addEventListener('input', this.#changePriceHandler);
+    this.#setDatePickerFrom();
+    this.#setDateToPicker();
   }
 
   get template() {
