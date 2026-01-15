@@ -58,6 +58,7 @@ export default class MainPresenter {
 
     if (this.#eventsComponents.element) {
       this.#eventsComponents.element.remove();
+      this.#eventsComponents = null;
     }
 
     this.#eventsComponents = new ListEventsView();
@@ -146,7 +147,7 @@ export default class MainPresenter {
       return;
     }
 
-    if (!Object.values(SortType).includes(sortType)) {
+    if (SortType[sortType.toLowerCase()]) {
       return;
     }
 

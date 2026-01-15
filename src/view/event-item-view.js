@@ -6,7 +6,7 @@ function createEventTemplate(point) {
   const { offer, basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination, isFavorite } = point;
   const formatYersMounthDay = (date) => dayjs(date).format('YYYY-MM-DD');
   const formatHourMinute = (date) => dayjs(date).format('HH:mm');
-  const formatYMDTHM = (date) => dayjs(date).format('HH:mm');
+  const formatYMDTHM = (date) => dayjs(date).format('YYYY-MM-DDTHH:mm');
   return `
     <li class="trip-events__item">
       <div class="event">
