@@ -3,8 +3,7 @@ import {TYPES} from './const';
 import {ALL_TYPES} from '../const';
 
 export function createOffer(){
-  const typeKeys = ALL_TYPES;
-  const randomType = getRandomArrayElement(typeKeys);
+  const randomType = getRandomArrayElement(ALL_TYPES);
 
   const offersForType = TYPES[randomType];
 

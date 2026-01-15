@@ -144,7 +144,7 @@ function sortPointDay(pointA, pointB) {
 function calculateTripInfo(points, destinations, types) {
   const totalPrice = points.reduce((sum, point) => {
     const { type, offers: selectedOfferIds, basePrice } = point;
-    let pointTotal = basePrice;
+    let pointTotal = +basePrice;
 
     if (selectedOfferIds?.length) {
       const offersForType = types[type];

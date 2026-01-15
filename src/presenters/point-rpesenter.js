@@ -82,10 +82,6 @@ export default class PointPresenter {
     }
   };
 
-  #handleFormSubmit = (updatedPoint) => {
-    this.#handleDataChange(updatedPoint);
-  };
-
   init() {
     let prevEventItemComponent = this.#eventItemComponent;
     let prevEventFormComponent = this.#eventFormComponent;
@@ -104,7 +100,7 @@ export default class PointPresenter {
       this.#allOffers,
       {
         onCloseClick: this.#handleCloseFormClick,
-        onFormSubmit: this.#handleFormSubmit,
+        onFormSubmit: this.#handleDataChange,
       }
     );
 
