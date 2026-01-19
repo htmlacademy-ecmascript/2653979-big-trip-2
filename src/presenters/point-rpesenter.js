@@ -1,6 +1,7 @@
 import EventFormView from '../view/event-form-view.js';
 import EventItemView from '../view/event-item-view.js';
 import { render, replace } from '../framework/render.js';
+import { UpdateType, UserAction } from '../const.js';
 
 const Mode = {
   DEFAULT: 'DEFAULT',
@@ -63,11 +64,14 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
-    this.#handleDataChange({
-      ...this.#point,
-      destination: this.#point.destination.id,
-      isFavorite: !this.#point.isFavorite
-    });
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      {
+        ...this.#point,
+        destination: this.#point.destination.id,
+        isFavorite: !this.#point.isFavorite
+      });
   };
 
   #handleCloseFormClick = () => {
@@ -80,6 +84,23 @@ export default class PointPresenter {
       this.#replaceFormToItem();
       window.removeEventListener('keydown', this.#escKeyDownHandler);
     }
+  };
+
+  #handleDeleteClick = (point) =>{
+    this.#handleDataChange(
+      UserAction.DELETE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
+  };
+
+  #handleSaveClick = (point) =>{
+    window.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#handleDataChange(
+      UserAction.UPDATE_POINT,
+      UpdateType.MINOR,
+      point,
+    );
   };
 
   init() {
@@ -100,7 +121,8 @@ export default class PointPresenter {
       this.#allOffers,
       {
         onCloseClick: this.#handleCloseFormClick,
-        onFormSubmit: this.#handleDataChange,
+        onFormSubmit: this.#handleSaveClick,
+        onDeletePoint: this.#handleDeleteClick,
       }
     );
 

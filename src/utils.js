@@ -82,18 +82,18 @@ const filter = {
   }),
 };
 
-function generateFilter(points) {
-  return Object.entries(filter).map(
-    ([filterType, filterPoints]) => ({
-      type: filterType,
-      count: filterPoints(points).length,
-    }),
-  );
-}
+// function generateFilter(points) {
+//   return Object.entries(filter).map(
+//     ([filterType, filterPoints]) => ({
+//       type: filterType,
+//       count: filterPoints(points).length,
+//     }),
+//   );
+// }
 
-function updateItem(items, update) {
-  return items.map((item) => item.id === update.id ? update : item);
-}
+// function updateItem(items, update) {
+//   return items.map((item) => item.id === update.id ? update : item);
+// }
 
 function getWeightForNullDate(dateA, dateB) {
   if (dateA === null && dateB === null) {
@@ -188,4 +188,4 @@ function calculateTripInfo(points, destinations, types) {
   };
 }
 
-export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase, filter, generateFilter, updateItem, sortPointDay, sortPointPrice, sortPointTime, calculateTripInfo };
+export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase, filter, sortPointDay, sortPointPrice, sortPointTime, calculateTripInfo };

@@ -4,7 +4,6 @@ function createListFiltersTemplate(filters, currentFilterType) {
   if (filters.lenght === 0) {
     return '';
   }
-
   return `
   <form class="trip-filters" action="#" method="get">
 ${filters.map((filter) => `
@@ -34,11 +33,11 @@ export default class ListControlView extends AbstractView {
     this.#handleFilterChange(evt.target.value);
   };
 
-  constructor(filters, currentFilterType, events) {
+  constructor(data) {
     super();
-    this.#filters = filters;
-    this.#currentFilter = currentFilterType;
-    this.#handleFilterChange = events;
+    this.#filters = data.filters;
+    this.#currentFilter = data.currentFilterType;
+    this.#handleFilterChange = data.events;
 
     this.element.addEventListener('change', this.#filterChangeHandler);
   }
