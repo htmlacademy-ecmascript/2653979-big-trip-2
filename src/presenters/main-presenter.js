@@ -6,9 +6,10 @@ import ListEventsView from '../view/list-events-view.js';
 import PointPresenter from '../presenters/point-rpesenter.js';
 import TripInfoView from '../view/trip-info-view.js';
 import NoPointsView from '../view/no-point-view.js';
+import LoadingView from '../view/loading-view.js';
 import NewPointButton from '../view/new-point-button.js';
 
-import { render, replace } from '../framework/render.js';
+import { remove, render, replace } from '../framework/render.js';
 import { filter, sortPointDay, sortPointTime, sortPointPrice } from '../utils.js';
 import { FILTER_TYPES, SortType, UpdateType, UserAction } from '../const.js';
 
@@ -24,6 +25,7 @@ export default class MainPresenter {
   #currentFilterType = FILTER_TYPES.EVERYTHING;
   #currentSortType = SortType.DAY;
   #tripFilterElement = null;
+  #loadingComponent = new LoadingView();
   #tripInfoComponent = null;
   #sortComponent = null;
   #noPointsComponent = null;
@@ -32,6 +34,7 @@ export default class MainPresenter {
   #filterType = null;
   #newPointPresenter = null;
   #addNewButtonComponent = null;
+  #isLoading = true;
 
   constructor({ headerContainer, mainContainer, pointModel, filterModel }) {
     this.#headerContainer = headerContainer;
@@ -39,9 +42,7 @@ export default class MainPresenter {
     this.#pointModel = pointModel;
     this.#filterModel = filterModel;
 
-    this.#points = this.#pointModel.points;
-    this.#destinations = this.#pointModel.destinations;
-    this.#offers = this.#pointModel.offers;
+
     this.#currentFilterType = this.#filterModel.filter;
 
     this.#tripFilterElement = this.#headerContainer.querySelector('.trip-controls__filters');
@@ -98,6 +99,15 @@ export default class MainPresenter {
       case UpdateType.MAJOR:
         this.#rerenderPoints({ resetSortType: true });
         break;
+      case UpdateType.INIT:
+        this.#isLoading = false;
+        this.#addNewButtonComponent.setDisabled(false);
+        this.#points = this.#pointModel.points;
+        this.#destinations = this.#pointModel.destinations;
+        this.#offers = this.#pointModel.offers;
+        remove(this.#loadingComponent);
+        this.#rerenderPoints({ resetSortType: true });
+        break;
       default:
         if (updateType === UpdateType.MAJOR) {
           this.#currentFilterType = this.#filterModel.filter;
@@ -112,6 +122,9 @@ export default class MainPresenter {
   };
 
   #renderNoPoints() {
+    if (this.#isLoading) {
+      return;
+    }
     if (this.#eventsComponents && this.#eventsComponents.element) {
       this.#eventsComponents.element.remove();
       this.#eventsComponents = null;
@@ -129,7 +142,14 @@ export default class MainPresenter {
     render(this.#noPointsComponent, this.#mainContainer);
   }
 
+  #renderLoading() {
+    if (this.#isLoading) {
+      render(this.#loadingComponent, this.#mainContainer);
+    }
+  }
+
   #rerenderPoints({ resetSortType = false } = {}) {
+    this.#renderLoading();
     this.#currentFilterType = this.#filterModel.filter;
     const filteredPoints = filter[this.#currentFilterType](this.#pointModel.points);
     if (this.#noPointsComponent) {
@@ -154,6 +174,10 @@ export default class MainPresenter {
     if (this.#eventsComponents && this.#eventsComponents.element) {
       this.#eventsComponents.element.remove();
       this.#eventsComponents = null;
+    }
+
+    if (this.#loadingComponent && this.#loadingComponent.element) {
+      this.#loadingComponent.element.remove();
     }
 
     if (!this.#sortComponent) {
@@ -201,14 +225,12 @@ export default class MainPresenter {
   }
 
   #renderPoint(point, tripList) {
-    const offer = this.#offers.find((off) => off.type === point.type);
-    const destination = this.#destinations.find((dest) => dest.id === point.destination);
+    // const offer = this.#offers.find((off) => off.type === point.type);
+    // const destination = this.#destinations.find((dest) => dest.id === point.destination);
 
     const pointPresenter = new PointPresenter({
       point: {
-        ...point,
-        offer,
-        destination
+        ...point
       },
       allDestinations: this.#destinations,
       allOffers: this.#offers,
@@ -315,6 +337,7 @@ export default class MainPresenter {
     this.#handleModelEvent(UpdateType.MAJOR);
 
     this.#addNewButtonComponent = new NewPointButton(this.#createNewPointHandler);
+    this.#addNewButtonComponent.setDisabled(true);
     render(this.#addNewButtonComponent, this.#headerContainer);
     const filterPresenter = new FilterPresenter({
       filterContainer: this.#tripFilterElement,

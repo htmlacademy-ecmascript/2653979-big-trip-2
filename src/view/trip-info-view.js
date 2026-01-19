@@ -1,9 +1,9 @@
 import AbstractView from '../framework/view/abstract-view';
-import { TYPES } from '../mock/const';
+import { ALL_TYPES } from '../const';
 import { calculateTripInfo } from '../utils';
 
 function createTripInfoTemplate(points, allDestinations) {
-  const data = calculateTripInfo(points, allDestinations, TYPES);
+  const data = calculateTripInfo(points, allDestinations, ALL_TYPES);
   return `
   <section class="trip-main__trip-info  trip-info">
             <div class="trip-info__main">

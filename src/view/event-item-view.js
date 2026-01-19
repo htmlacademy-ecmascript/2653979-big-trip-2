@@ -2,8 +2,11 @@ import AbstractView from '../framework/view/abstract-view';
 import dayjs from 'dayjs';
 import { convertDate } from '../utils.js';
 
-function createEventTemplate(point) {
-  const { offer, basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination, isFavorite } = point;
+function createEventTemplate(point, AllDestinations, AllOffers) {
+  const { basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination, isFavorite } = point;
+  const currentOffer = AllOffers.find((offer) => offer.type === type) || { offers: [] };
+  const currentDestination = AllDestinations.find((dest) => dest.id === destination);
+
   const formatYersMounthDay = (date) => dayjs(date).format('YYYY-MM-DD');
   const formatHourMinute = (date) => dayjs(date).format('HH:mm');
   const formatYMDTHM = (date) => dayjs(date).format('YYYY-MM-DDTHH:mm');
@@ -14,7 +17,7 @@ function createEventTemplate(point) {
         <div class="event__type">
           <img class="event__type-icon" width="42" height="42" src="img/icons/${type}.png" alt="Event ${type} icon">
         </div>
-        <h3 class="event__title">${type} ${destination.name}</h3>
+        <h3 class="event__title">${type} ${currentDestination.name}</h3>
         <div class="event__schedule">
           <p class="event__time">
             <time class="event__start-time" datetime="${formatYMDTHM(dateFrom)}">${formatHourMinute(dateFrom)}</time>
@@ -27,8 +30,8 @@ function createEventTemplate(point) {
           &euro;&nbsp;<span class="event__price-value">${basePrice}</span>
         </p>
         <h4 class="visually-hidden">Offers:</h4>
-        ${ offer ?
-    createOffersTemplate(offer.offers, selectedOfferIds) : ''
+        ${ currentOffer ?
+    createOffersTemplate(currentOffer, selectedOfferIds) : ''
 }
         <button class="event__favorite-btn ${isFavorite ? 'event__favorite-btn--active' : ''} " type="button">
           <span class="visually-hidden">Add to favorite</span>
@@ -48,8 +51,7 @@ function createOffersTemplate(allOffers, selectedOfferIds) {
   if (selectedOfferIds.length === 0) {
     return '';
   }
-
-  const selectedOffers = allOffers.filter((offer) => selectedOfferIds.includes(offer.id));
+  const selectedOffers = allOffers.offers.filter((offer) => selectedOfferIds.includes(offer.id));
 
   if (selectedOffers.length === 0) {
     return '';
@@ -72,6 +74,8 @@ export default class EventItemView extends AbstractView {
   #openClick = null;
   #favoriteClick = null;
   #point = null;
+  #AllOffers = null;
+  #AllDestinations = null;
 
   #openFormHandler = (evt) => {
     evt.preventDefault();
@@ -83,9 +87,11 @@ export default class EventItemView extends AbstractView {
     this.#favoriteClick();
   };
 
-  constructor(point, events) {
+  constructor(point, AllDestinations, AllOffers, events) {
     super();
     this.#point = point;
+    this.#AllOffers = AllOffers;
+    this.#AllDestinations = AllDestinations;
     this.#openClick = events.onOpenClick;
     this.#favoriteClick = events.onFavoriteClick;
     this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#openFormHandler);
@@ -93,6 +99,6 @@ export default class EventItemView extends AbstractView {
   }
 
   get template() {
-    return createEventTemplate(this.#point);
+    return createEventTemplate(this.#point, this.#AllDestinations, this.#AllOffers);
   }
 }

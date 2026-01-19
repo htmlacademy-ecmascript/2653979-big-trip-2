@@ -64,14 +64,11 @@ export default class PointPresenter {
   };
 
   #handleFavoriteClick = () => {
+    this.#point.isFavorite = !this.#point.isFavorite;
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
-      {
-        ...this.#point,
-        destination: this.#point.destination.id,
-        isFavorite: !this.#point.isFavorite
-      });
+      this.#point);
   };
 
   #handleCloseFormClick = () => {
@@ -96,10 +93,11 @@ export default class PointPresenter {
 
   #handleSaveClick = (point) =>{
     window.removeEventListener('keydown', this.#escKeyDownHandler);
+    this.#point = point;
     this.#handleDataChange(
       UserAction.UPDATE_POINT,
       UpdateType.MINOR,
-      point,
+      this.#point,
     );
   };
 
@@ -109,6 +107,8 @@ export default class PointPresenter {
 
     this.#eventItemComponent = new EventItemView(
       this.#point,
+      this.#allDestinations,
+      this.#allOffers,
       {
         onOpenClick: this.#handleOpenFormClick,
         onFavoriteClick: this.#handleFavoriteClick,
