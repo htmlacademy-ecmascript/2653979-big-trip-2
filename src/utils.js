@@ -1,14 +1,6 @@
 import dayjs from 'dayjs';
 import { FILTER_TYPES } from './const';
 
-function getRandomArrayElement(items) {
-  return items[Math.floor(Math.random() * items.length)];
-}
-
-function getRandomNumber(min, max) {
-  return Math.floor(Math.random() * (max - min + 1)) + min;
-}
-
 function formatDuration(startDate, endDate) {
   if (!startDate || !endDate) {
     return '';
@@ -52,9 +44,6 @@ function formatDate(dateString) {
   return `${day}/${month}/${year} ${hours}:${minutes}`;
 }
 
-function CamelCaseToKebabCase(string) {
-  return string.replace(/([A-Z])/g, '-$1').toLowerCase();
-}
 const filter = {
   [FILTER_TYPES.EVERYTHING]: (points) => points,
 
@@ -81,19 +70,6 @@ const filter = {
       (pointDateTo.isSame(now) || pointDateTo.isAfter(now));
   }),
 };
-
-// function generateFilter(points) {
-//   return Object.entries(filter).map(
-//     ([filterType, filterPoints]) => ({
-//       type: filterType,
-//       count: filterPoints(points).length,
-//     }),
-//   );
-// }
-
-// function updateItem(items, update) {
-//   return items.map((item) => item.id === update.id ? update : item);
-// }
 
 function getWeightForNullDate(dateA, dateB) {
   if (dateA === null && dateB === null) {
@@ -188,4 +164,4 @@ function calculateTripInfo(points, destinations, types) {
   };
 }
 
-export { getRandomArrayElement, getRandomNumber, convertDate, formatDate, CamelCaseToKebabCase, filter, sortPointDay, sortPointPrice, sortPointTime, calculateTripInfo };
+export { convertDate, formatDate, filter, sortPointDay, sortPointPrice, sortPointTime, calculateTripInfo };

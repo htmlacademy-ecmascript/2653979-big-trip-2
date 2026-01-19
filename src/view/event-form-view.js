@@ -10,6 +10,7 @@ import 'flatpickr/dist/flatpickr.min.css';
 function createEventFormTemplate(point, allDestinations, allOffers) {
   const { basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination } = point;
   const currentOffer = allOffers.find((offer) => offer.type === type) || { offers: [] };
+  const currentDestination = allDestinations.find((dest) => dest.id === destination);
   return `
     <li class="trip-events__item">
       <form class="event event--edit" action="#" method="post">
@@ -33,7 +34,7 @@ function createEventFormTemplate(point, allDestinations, allOffers) {
             <label class="event__label event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(destination.name || '')}" list="destination-list-1" autocomplete="off" placeholder="Type to see destinations...">
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode((currentDestination ? currentDestination.name : destination.name) || '')}" list="destination-list-1" autocomplete="off" placeholder="Type to see destinations...">
             <datalist id="destination-list-1">
               ${createDestinationsListTemplate(allDestinations)}
             </datalist>
@@ -63,7 +64,7 @@ function createEventFormTemplate(point, allDestinations, allOffers) {
         </header>
         <section class="event__details">
             ${createOffersListTemplate(currentOffer.offers, selectedOfferIds)}
-            ${createDestinationInfoTemplate(destination)}
+            ${createDestinationInfoTemplate(currentDestination)}
         </section>
       </form>
     </li>
@@ -116,7 +117,7 @@ function createOffersListTemplate(allOffers, selectedOfferIds) {
 }
 
 function createDestinationInfoTemplate(destination) {
-  if (!destination.description && !destination.pictures) {
+  if (destination.description.length === 0 && destination.pictures.length === 0) {
     return '';
   }
   return `<section class="event__section event__section--destination">
@@ -221,7 +222,7 @@ export default class EventFormView extends AbstractStatefulView {
 
     return {
       type: this._state.type,
-      destination: this._state.destination.id,
+      destination: this._state.destination,
       dateFrom: this._state.dateFrom instanceof Object ? this._state.dateFrom.toISOString() : this._state.dateFrom,
       dateTo: this._state.dateTo instanceof Object ? this._state.dateTo.toISOString() : this._state.dateTo,
       basePrice: this._state.basePrice,
@@ -276,13 +277,11 @@ export default class EventFormView extends AbstractStatefulView {
 
   #changeDestinationHandler = (evt) => {
     evt.preventDefault();
-    const destinationName = evt.target.value.trim();
+    const destinationName = evt.target.value;
 
     if (destinationName === '') {
       this.updateElement({
         destination: { name: '', description: '', pictures: [] },
-        isDescription: false,
-        isPictures: false
       });
       return;
     }
@@ -302,9 +301,7 @@ export default class EventFormView extends AbstractStatefulView {
     }
 
     this.updateElement({
-      destination: destinationItem,
-      isDescription: destinationItem.description !== null && destinationItem.description !== undefined,
-      isPictures: destinationItem.pictures !== null && destinationItem.pictures !== undefined
+      destination: destinationItem.id,
     });
   };
 
