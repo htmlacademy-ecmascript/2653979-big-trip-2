@@ -1,4 +1,3 @@
-// import ListFiltersView from '../view/list-filters-view.js';
 import FilterPresenter from './filter-presenter.js';
 import NewPointPresenter from './new-point-presenter.js';
 import ListSortView from '../view/list-sort-view.js';
@@ -8,10 +7,16 @@ import TripInfoView from '../view/trip-info-view.js';
 import NoPointsView from '../view/no-point-view.js';
 import LoadingView from '../view/loading-view.js';
 import NewPointButton from '../view/new-point-button.js';
+import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
 import { remove, render, replace } from '../framework/render.js';
 import { filter, sortPointDay, sortPointTime, sortPointPrice } from '../utils.js';
 import { FILTER_TYPES, SortType, UpdateType, UserAction } from '../const.js';
+
+const timeLimit = {
+  LOWER_LIMIT: 350,
+  UPPER_LIMIT: 1000,
+};
 
 export default class MainPresenter {
   #headerContainer = null;
@@ -35,6 +40,11 @@ export default class MainPresenter {
   #newPointPresenter = null;
   #addNewButtonComponent = null;
   #isLoading = true;
+
+  #uiBlocker = new UiBlocker({
+    lowerLimit: timeLimit.LOWER_LIMIT,
+    upperLimit: timeLimit.UPPER_LIMIT,
+  });
 
   constructor({ headerContainer, mainContainer, pointModel, filterModel }) {
     this.#headerContainer = headerContainer;
@@ -74,18 +84,36 @@ export default class MainPresenter {
     return filteredPoints;
   }
 
-  #handleViewAction = (actionType, updateType, update) => {
+  #handleViewAction = async (actionType, updateType, update) => {
+    this.#uiBlocker.block();
     switch (actionType) {
       case UserAction.UPDATE_POINT:
-        this.#pointModel.updatePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setSaving();
+        try {
+          await this.#pointModel.updatePoint(updateType, update);
+        } catch (err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
       case UserAction.ADD_POINT:
-        this.#pointModel.addPoint(updateType, update);
+        this.#newPointPresenter.setSaving();
+        try {
+          await this.#pointModel.addPoint(updateType, update);
+          this.#newPointPresenter.destroy();
+        } catch (err) {
+          this.#newPointPresenter.setAborting();
+        }
         break;
       case UserAction.DELETE_POINT:
-        this.#pointModel.deletePoint(updateType, update);
+        this.#pointPresenters.get(update.id).setDeleting();
+        try {
+          await this.#pointModel.deletePoint(updateType, update);
+        } catch (err) {
+          this.#pointPresenters.get(update.id).setAborting();
+        }
         break;
     }
+    this.#uiBlocker.unblock();
   };
 
   #handleModelEvent = (updateType, data) => {
@@ -107,12 +135,6 @@ export default class MainPresenter {
         this.#offers = this.#pointModel.offers;
         remove(this.#loadingComponent);
         this.#rerenderPoints({ resetSortType: true });
-        break;
-      default:
-        if (updateType === UpdateType.MAJOR) {
-          this.#currentFilterType = this.#filterModel.filter;
-          this.#rerenderPoints({ resetSortType: true });
-        }
         break;
     }
   };
@@ -225,13 +247,8 @@ export default class MainPresenter {
   }
 
   #renderPoint(point, tripList) {
-    // const offer = this.#offers.find((off) => off.type === point.type);
-    // const destination = this.#destinations.find((dest) => dest.id === point.destination);
-
     const pointPresenter = new PointPresenter({
-      point: {
-        ...point
-      },
+      point,
       allDestinations: this.#destinations,
       allOffers: this.#offers,
       container: tripList,
@@ -307,8 +324,8 @@ export default class MainPresenter {
     if (this.#eventsComponents && this.#eventsComponents.element) {
       this.#newPointPresenter = new NewPointPresenter({
         pointListContainer: this.#eventsComponents.element,
-        offers: this.#pointModel.offers,
-        destinations: this.#pointModel.destinations,
+        offers: this.#offers,
+        destinations: this.#destinations,
         onViewAction: this.#handleViewAction,
         onDestroy: this.#handleDestroyForm,
       });

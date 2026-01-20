@@ -36,7 +36,6 @@ export default class NewPointPresenter {
       UpdateType.MINOR,
       point
     );
-    this.destroy();
   };
 
   #handleDeleteClick = () => {
@@ -49,6 +48,25 @@ export default class NewPointPresenter {
       this.destroy();
     }
   };
+
+  setSaving() {
+    this.#pointEditComponent.updateElement({
+      isDisabled: true,
+      isSaving: true,
+    });
+  }
+
+  setAborting() {
+    const resetFormState = () => {
+      this.#pointEditComponent.updateElement({
+        isDisabled: false,
+        isSaving: false,
+        isDeleting: false,
+      });
+    };
+
+    this.#pointEditComponent.shake(resetFormState);
+  }
 
   init() {
     if (this.#pointEditComponent !== null) {
@@ -67,7 +85,6 @@ export default class NewPointPresenter {
         onDeletePoint: this.#handleDeleteClick,
       }
     );
-
     render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
   }
@@ -75,19 +92,11 @@ export default class NewPointPresenter {
   #createEmptyPoint() {
     const defaultType = 'flight';
 
-    const defaultDestination = this.#allDestinations[0] || {
-      id: '',
-      name: '',
-      description: '',
-      pictures: []
-    };
-
     return {
-      id: crypto.randomUUID(),
       type: defaultType,
-      destination: defaultDestination,
-      dateFrom: new Date(),
-      dateTo: new Date(Date.now() + 3600000),
+      destination: this.#allDestinations[0].id,
+      dateFrom: new Date().toISOString(),
+      dateTo: new Date(Date.now() + 3600000).toISOString(),
       basePrice: 0,
       offers: [],
       isFavorite: false
