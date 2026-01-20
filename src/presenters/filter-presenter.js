@@ -25,22 +25,22 @@ export default class FilterPresenter {
     return [
       {
         type: FILTER_TYPES.EVERYTHING,
-        name: 'everything',
+        name: FILTER_TYPES.EVERYTHING,
         count: filter[FILTER_TYPES.EVERYTHING](points).length,
       },
       {
         type: FILTER_TYPES.FUTURE,
-        name: 'future',
+        name: FILTER_TYPES.FUTURE,
         count: filter[FILTER_TYPES.FUTURE](points).length,
       },
       {
         type: FILTER_TYPES.PAST,
-        name: 'past',
+        name: FILTER_TYPES.PAST,
         count: filter[FILTER_TYPES.PAST](points).length,
       },
       {
         type: FILTER_TYPES.PRESENT,
-        name: 'present',
+        name: FILTER_TYPES.PRESENT,
         count: filter[FILTER_TYPES.PRESENT](points).length,
       },
     ];
@@ -63,7 +63,7 @@ export default class FilterPresenter {
     const prevFilterComponent = this.#filterComponent;
 
     this.#filterComponent = new ListControlView({
-      filters: filters,
+      filters,
       currentFilterType: this.#filterModel.filter,
       events: this.#handleFilterTypeChange,
     });

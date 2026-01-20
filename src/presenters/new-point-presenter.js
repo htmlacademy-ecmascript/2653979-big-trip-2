@@ -1,6 +1,7 @@
 import { remove, render, RenderPosition } from '../framework/render.js';
 import EventFormView from '../view/event-form-view';
 import { UserAction, UpdateType } from '../const';
+import { createEmptyPoint } from '../utils.js';
 
 export default class NewPointPresenter {
   #pointListContainer = null;
@@ -8,7 +9,6 @@ export default class NewPointPresenter {
   #handleDestroy = null;
   #allOffers = [];
   #allDestinations = [];
-
   #pointEditComponent = null;
 
   constructor({ pointListContainer, offers, destinations, onViewAction, onDestroy }) {
@@ -73,8 +73,7 @@ export default class NewPointPresenter {
       return;
     }
 
-    const emptyPoint = this.#createEmptyPoint();
-
+    const emptyPoint = createEmptyPoint(this.#allDestinations);
     this.#pointEditComponent = new EventFormView(
       emptyPoint,
       this.#allDestinations,
@@ -87,19 +86,5 @@ export default class NewPointPresenter {
     );
     render(this.#pointEditComponent, this.#pointListContainer, RenderPosition.AFTERBEGIN);
     document.addEventListener('keydown', this.#escKeyDownHandler);
-  }
-
-  #createEmptyPoint() {
-    const defaultType = 'flight';
-
-    return {
-      type: defaultType,
-      destination: this.#allDestinations[0].id,
-      dateFrom: new Date().toISOString(),
-      dateTo: new Date(Date.now() + 3600000).toISOString(),
-      basePrice: 0,
-      offers: [],
-      isFavorite: false
-    };
   }
 }
