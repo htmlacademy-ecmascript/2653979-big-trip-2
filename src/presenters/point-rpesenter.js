@@ -35,6 +35,7 @@ export default class PointPresenter {
     if (this.#eventFormComponent) {
       this.#eventFormComponent.element.remove();
     }
+    window.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#eventItemComponent = null;
     this.#eventFormComponent = null;
   }
@@ -47,15 +48,15 @@ export default class PointPresenter {
   }
 
   #replaceItemToForm() {
-    replace(this.#eventFormComponent, this.#eventItemComponent);
     window.addEventListener('keydown', this.#escKeyDownHandler);
+    replace(this.#eventFormComponent, this.#eventItemComponent);
     this.#handleModeChange();
     this.#mode = Mode.EDITING;
   }
 
   #replaceFormToItem() {
-    replace(this.#eventItemComponent, this.#eventFormComponent);
     window.removeEventListener('keydown', this.#escKeyDownHandler);
+    replace(this.#eventItemComponent, this.#eventFormComponent);
     this.#mode = Mode.DEFAULT;
   }
 
@@ -78,8 +79,8 @@ export default class PointPresenter {
   #escKeyDownHandler = (evt) => {
     if (evt.key === 'Escape') {
       evt.preventDefault();
-      this.#replaceFormToItem();
       window.removeEventListener('keydown', this.#escKeyDownHandler);
+      this.#replaceFormToItem();
     }
   };
 

@@ -1,5 +1,5 @@
 import dayjs from 'dayjs';
-import { FILTER_TYPES } from './const';
+import { FILTER_TYPES, ALL_TYPES } from './const';
 
 function formatDuration(startDate, endDate) {
   if (!startDate || !endDate) {
@@ -32,6 +32,7 @@ function convertDate(startDate, endDate) {
   const duration = formatDuration(startDate, endDate);
   return `${duration}`;
 }
+
 function formatDate(dateString) {
   const date = new Date(dateString);
 
@@ -164,4 +165,17 @@ function calculateTripInfo(points, destinations, types) {
   };
 }
 
-export { convertDate, formatDate, filter, sortPointDay, sortPointPrice, sortPointTime, calculateTripInfo };
+function createEmptyPoint(allDestinations) {
+  const defaultType = ALL_TYPES[0];
+  return {
+    type: defaultType,
+    destination: allDestinations[0].id,
+    dateFrom: new Date().toISOString(),
+    dateTo: new Date(Date.now() + 3600000).toISOString(),
+    basePrice: 0,
+    offers: [],
+    isFavorite: false
+  };
+}
+
+export { convertDate, formatDate, filter, sortPointDay, sortPointPrice, sortPointTime, calculateTripInfo, createEmptyPoint };

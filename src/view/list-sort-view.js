@@ -9,10 +9,8 @@ function createListSortTemplate(currentSortType) {
       <input id="sort-event" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="event" disabled>
       <label class="trip-sort__btn" for="sort-event">Event</label>
     </div>
-
     ${createSortPart(SortType.TIME, currentSortType)}
     ${createSortPart(SortType.PRICE, currentSortType)}
-
     <div class="trip-sort__item  trip-sort__item--offer">
       <input id="sort-offer" class="trip-sort__input  visually-hidden" type="radio" name="trip-sort" value="offer" disabled>
       <label class="trip-sort__btn" for="sort-offer">Offers</label>
@@ -39,7 +37,6 @@ export default class ListSortView extends AbstractView {
       return;
     }
     evt.preventDefault();
-
 
     if (SortType[sortType.toUpperCase()]) {
       this.#handleSortTypeChange(sortType);
