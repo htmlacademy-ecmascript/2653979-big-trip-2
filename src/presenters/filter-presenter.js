@@ -34,14 +34,14 @@ export default class FilterPresenter {
         count: filter[FILTER_TYPES.FUTURE](points).length,
       },
       {
-        type: FILTER_TYPES.PAST,
-        name: FILTER_TYPES.PAST,
-        count: filter[FILTER_TYPES.PAST](points).length,
-      },
-      {
         type: FILTER_TYPES.PRESENT,
         name: FILTER_TYPES.PRESENT,
         count: filter[FILTER_TYPES.PRESENT](points).length,
+      },
+      {
+        type: FILTER_TYPES.PAST,
+        name: FILTER_TYPES.PAST,
+        count: filter[FILTER_TYPES.PAST](points).length,
       },
     ];
   }

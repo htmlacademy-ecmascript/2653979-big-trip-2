@@ -11,9 +11,10 @@ function createEventFormTemplate(point, allDestinations, allOffers, isDisabled, 
   const { basePrice, dateFrom, dateTo, type, offers: selectedOfferIds, destination } = point;
   const currentOffer = allOffers.find((offer) => offer.type === type) || { offers: [] };
   const currentDestination = allDestinations.find((dest) => dest.id === destination);
+  const newPoint = destination.length === 0;
   return `
-    <li class="trip-events__item">
-      <form class="event event--edit" action="#" method="post">
+    <li class="trip-events__item" ${isDisabled ? 'tabindex="-1"' : ''}>
+      <form class="event event--edit" action="#" method="post"  ${isDisabled ? 'tabindex="-1"' : ''}>
         <header class="event__header">
           <div class="event__type-wrapper">
             <label class="event__type event__type-btn" for="event-type-toggle-1">
@@ -34,7 +35,7 @@ function createEventFormTemplate(point, allDestinations, allOffers, isDisabled, 
             <label class="event__label event__type-output" for="event-destination-1">
               ${type}
             </label>
-            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentDestination ? currentDestination.name : '')}" list="destination-list-1" autocomplete="off" ${isDisabled ? 'disabled' : ''} placeholder="Type to see destinations..." required>
+            <input class="event__input event__input--destination" id="event-destination-1" type="text" name="event-destination" value="${he.encode(currentDestination ? currentDestination.name : '')}" list="destination-list-1" autocomplete="off" ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''} placeholder="Type to see destinations..." required>
             <datalist id="destination-list-1">
               ${createDestinationsListTemplate(allDestinations)}
             </datalist>
@@ -42,10 +43,10 @@ function createEventFormTemplate(point, allDestinations, allOffers, isDisabled, 
 
           <div class="event__field-group event__field-group--time">
             <label class="visually-hidden" for="event-start-time-1">From</label>
-            <input class="event__input event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(dateFrom)}" readonly ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input event__input--time" id="event-start-time-1" type="text" name="event-start-time" value="${formatDate(dateFrom)}" readonly ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''}>
             &mdash;
             <label class="visually-hidden" for="event-end-time-1">To</label>
-            <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(dateTo)}" readonly ${isDisabled ? 'disabled' : ''}>
+            <input class="event__input event__input--time" id="event-end-time-1" type="text" name="event-end-time" value="${formatDate(dateTo)}" readonly ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''}>
           </div>
 
           <div class="event__field-group event__field-group--price">
@@ -53,12 +54,12 @@ function createEventFormTemplate(point, allDestinations, allOffers, isDisabled, 
               <span class="visually-hidden">Price</span>
               &euro;
             </label>
-            <input class="event__input event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}" min="1" step="1" placeholder="Enter price" ${isDisabled ? 'disabled' : ''} required>
+            <input class="event__input event__input--price" id="event-price-1" type="number" name="event-price" value="${basePrice}" min="1" step="1" placeholder="Enter price" ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''} required>
           </div>
 
-          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
-          <button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>
-          <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}>
+          <button class="event__save-btn btn btn--blue" type="submit" ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''}>${isSaving ? 'Saving...' : 'Save'}</button>
+          ${createResetButtonTemplate(newPoint, isDeleting, isDisabled)}
+          <button class="event__rollup-btn" type="button" ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''}>
             <span class="visually-hidden">Open event</span>
           </button>
         </header>
@@ -69,6 +70,13 @@ function createEventFormTemplate(point, allDestinations, allOffers, isDisabled, 
       </form>
     </li>
   `;
+}
+
+function createResetButtonTemplate(newPoint, isDeleting, isDisabled) {
+  if (newPoint){
+    return `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''}>Cancel</button>`;
+  }
+  return `<button class="event__reset-btn" type="reset" ${isDisabled ? 'disabled' : ''}  ${isDisabled ? 'tabindex="-1"' : ''}>${isDeleting ? 'Deleting...' : 'Delete'}</button>`;
 }
 
 function createEventTypesListTemplate(currentType) {
@@ -103,7 +111,8 @@ function createOffersListTemplate(allOffers, selectedOfferIds, isDisabled) {
                      name="event-offer"
                      value="${offer.id}"
                      ${isChecked ? 'checked' : ''}
-                     ${isDisabled ? 'disabled' : ''}>
+                     ${isDisabled ? 'disabled' : ''}
+                      ${isDisabled ? 'tabindex="-1"' : ''}>
               <label class="event__offer-label" for="event-offer-${offer.id}">
                 <span class="event__offer-title">${offer.title}</span>
                 &plus;&euro;&nbsp;
@@ -147,6 +156,42 @@ export default class EventFormView extends AbstractStatefulView {
   #handleFormSubmit = null;
   #datepickerFrom = null;
   #datepickerTo = null;
+  #originalPoint = null;
+
+  constructor(point = {}, allDestinations = [], allOffers = [], handlers) {
+    super();
+    this.#originalPoint = point;
+    this._setState(EventFormView.parsePointToState(point));
+    this.#allDestinations = allDestinations;
+    this.#allOffers = allOffers;
+    this.#handleCloseClick = handlers.onCloseClick;
+    this.#handleFormSubmit = handlers.onFormSubmit;
+    this.#handleDeleteClick = handlers.onDeletePoint;
+    this._restoreHandlers();
+  }
+
+  _restoreHandlers() {
+    this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
+    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormHandler);
+    this.element.querySelector('.event__type-group').addEventListener('click', this.#changeEventHandler);
+
+    const destinationInput = this.element.querySelector('.event__input--destination');
+    destinationInput.addEventListener('change', this.#changeDestinationHandler);
+
+    const priceInput = this.element.querySelector('.event__input--price');
+    priceInput.addEventListener('input', this.#changePriceHandler);
+
+    const startTimeInput = this.element.querySelector('#event-start-time-1');
+    const endTimeInput = this.element.querySelector('#event-end-time-1');
+
+    startTimeInput.addEventListener('keydown', this.#preventManualTimeInput);
+    endTimeInput.addEventListener('keydown', this.#preventManualTimeInput);
+
+    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deletePointHandler);
+
+    this.#setDatePickerFrom();
+    this.#setDateToPicker();
+  }
 
   removeElement() {
     super.removeElement();
@@ -191,17 +236,20 @@ export default class EventFormView extends AbstractStatefulView {
   }
 
   #formSubmitHandler = (evt) => {
+    this._state.isDisabled = true;
     evt.preventDefault();
 
     const form = this.element.querySelector('form');
     if (!form.checkValidity()) {
       form.reportValidity();
+      this._state.isDisabled = false;
       return;
     }
     const destinationInput = this.element.querySelector('.event__input--destination');
     if (!this.#isValidDestination(destinationInput.value)) {
       destinationInput.setCustomValidity('Please select a destination from the list');
       destinationInput.reportValidity();
+      this._state.isDisabled = false;
       return;
     }
 
@@ -246,6 +294,7 @@ export default class EventFormView extends AbstractStatefulView {
 
   #closeFormHandler = (evt) => {
     evt.preventDefault();
+    this.reset(this.#originalPoint);
     this.#handleCloseClick();
   };
 
@@ -331,46 +380,17 @@ export default class EventFormView extends AbstractStatefulView {
     const point = { ...state };
     delete point.isDisabled;
     delete point.isSaving;
-    delete point.isDisabled;
+    delete point.isDeleting;
     return point;
-  }
-
-  constructor(point = {}, allDestinations = [], allOffers = [], handlers) {
-    super();
-    this._setState(EventFormView.parsePointToState(point));
-    this.#allDestinations = allDestinations;
-    this.#allOffers = allOffers;
-    this.#handleCloseClick = handlers.onCloseClick;
-    this.#handleFormSubmit = handlers.onFormSubmit;
-    this.#handleDeleteClick = handlers.onDeletePoint;
-    this._restoreHandlers();
-  }
-
-  _restoreHandlers() {
-    this.element.querySelector('.event__save-btn').addEventListener('click', this.#formSubmitHandler);
-    this.element.querySelector('.event__rollup-btn').addEventListener('click', this.#closeFormHandler);
-    this.element.querySelector('.event__type-group').addEventListener('click', this.#changeEventHandler);
-
-    const destinationInput = this.element.querySelector('.event__input--destination');
-    destinationInput.addEventListener('change', this.#changeDestinationHandler);
-
-    const priceInput = this.element.querySelector('.event__input--price');
-    priceInput.addEventListener('input', this.#changePriceHandler);
-
-    const startTimeInput = this.element.querySelector('#event-start-time-1');
-    const endTimeInput = this.element.querySelector('#event-end-time-1');
-
-    startTimeInput.addEventListener('keydown', this.#preventManualTimeInput);
-    endTimeInput.addEventListener('keydown', this.#preventManualTimeInput);
-
-    this.element.querySelector('.event__reset-btn').addEventListener('click', this.#deletePointHandler);
-
-    this.#setDatePickerFrom();
-    this.#setDateToPicker();
   }
 
   #deletePointHandler = (evt) => {
     evt.preventDefault();
+
+    if (this._state.isDisabled) {
+      return;
+    }
+
     this.#handleDeleteClick(EventFormView.parseStateToPoint(this._state));
   };
 

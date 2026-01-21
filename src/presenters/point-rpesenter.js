@@ -80,6 +80,7 @@ export default class PointPresenter {
     if (evt.key === 'Escape') {
       evt.preventDefault();
       window.removeEventListener('keydown', this.#escKeyDownHandler);
+      this.#eventFormComponent.reset(this.#point);
       this.#replaceFormToItem();
     }
   };
@@ -93,7 +94,6 @@ export default class PointPresenter {
   };
 
   #handleSaveClick = (point) =>{
-    window.removeEventListener('keydown', this.#escKeyDownHandler);
     this.#point = point;
     this.#handleDataChange(
       UserAction.UPDATE_POINT,

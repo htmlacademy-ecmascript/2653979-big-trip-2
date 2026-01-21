@@ -34,6 +34,9 @@ function convertDate(startDate, endDate) {
 }
 
 function formatDate(dateString) {
+  if (dateString.length === 0){
+    return dateString;
+  }
   const date = new Date(dateString);
 
   const day = String(date.getDate()).padStart(2, '0');
@@ -118,13 +121,18 @@ function sortPointDay(pointA, pointB) {
   return dateDiff;
 }
 
-function calculateTripInfo(points, destinations, types) {
+function calculateTripInfo(points, destinations, allOffers) {
+  const offersByType = {};
+  allOffers.forEach((offerGroup) => {
+    offersByType[offerGroup.type] = offerGroup.offers;
+  });
+
   const totalPrice = points.reduce((sum, point) => {
     const { type, offers: selectedOfferIds, basePrice } = point;
     let pointTotal = +basePrice;
 
     if (selectedOfferIds?.length) {
-      const offersForType = types[type];
+      const offersForType = offersByType[type];
       if (offersForType) {
         selectedOfferIds.forEach((offerId) => {
           const selectedOffer = offersForType.find((offer) => offer.id === offerId);
@@ -165,13 +173,12 @@ function calculateTripInfo(points, destinations, types) {
   };
 }
 
-function createEmptyPoint(allDestinations) {
-  const defaultType = ALL_TYPES[0];
+function createEmptyPoint() {
   return {
-    type: defaultType,
-    destination: allDestinations[0].id,
-    dateFrom: new Date().toISOString(),
-    dateTo: new Date(Date.now() + 3600000).toISOString(),
+    type: ALL_TYPES[0],
+    destination: '',
+    dateFrom: '',
+    dateTo: '',
     basePrice: 0,
     offers: [],
     isFavorite: false

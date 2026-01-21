@@ -1,11 +1,13 @@
 import AbstractView from '../framework/view/abstract-view';
-import { FILTER_TYPES } from '../const';
+import { FILTER_TYPES, LAOD_STATUS } from '../const';
 
 const noPointsTextType = {
   [FILTER_TYPES.EVERYTHING]: 'Click New Event to create your first point',
-  [FILTER_TYPES.FUTURE]: 'There`s nothing to do for the future',
-  [FILTER_TYPES.PAST]: 'There are no cases left in the past',
-  [FILTER_TYPES.PRESENT]: 'There are no cases in the present',
+  [FILTER_TYPES.FUTURE]: 'There are no future events now',
+  [FILTER_TYPES.PAST]: 'There are no past events now',
+  [FILTER_TYPES.PRESENT]: 'There are no present events now',
+  [LAOD_STATUS.LOAD_FAILED]: 'Failed to load latest route information',
+  [LAOD_STATUS.LOAD]: 'Loading...',
 };
 
 function createNoPointsTemplate(filterType) {

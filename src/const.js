@@ -21,3 +21,7 @@ export const UserAction = {
   ADD_POINT: 'ADD_POINT',
   DELETE_POINT: 'DELETE_POINT',
 };
+export const LAOD_STATUS = {
+  LOAD_FAILED: 'LOAD_FAILED',
+  LOAD: 'LOAD',
+};

@@ -3,6 +3,7 @@ import Observable from '../framework/observable';
 
 export default class PointModel extends Observable {
   #pointsApiService = null;
+  #isFailLoad = false;
   #points = [];
   #destinations = [];
   #offers = [];
@@ -37,8 +38,10 @@ export default class PointModel extends Observable {
       this.#points = points.map(this.#adaptToClient);
       this.#offers = offers;
       this.#destinations = destinations;
+      this.#isFailLoad = false;
     } catch (err) {
       this.#points = [];
+      this.#isFailLoad = true;
     }
     this._notify(UpdateType.INIT);
   }
@@ -53,6 +56,10 @@ export default class PointModel extends Observable {
 
   get offers() {
     return this.#offers;
+  }
+
+  get status() {
+    return this.#isFailLoad;
   }
 
 
