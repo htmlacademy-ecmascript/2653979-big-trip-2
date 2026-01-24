@@ -33,11 +33,11 @@ function convertDate(startDate, endDate) {
   return `${duration}`;
 }
 
-function formatDate(dateString) {
-  if (dateString.length === 0){
-    return dateString;
+function formatDate(unformatingDate) {
+  if (unformatingDate.length === 0){
+    return unformatingDate;
   }
-  const date = new Date(dateString);
+  const date = new Date(unformatingDate);
 
   const day = String(date.getDate()).padStart(2, '0');
   const month = String(date.getMonth() + 1).padStart(2, '0');
@@ -146,12 +146,32 @@ function calculateTripInfo(points, destinations, allOffers) {
     return sum + pointTotal;
   }, 0);
 
-  const destinationNames = points.map((point) => {
-    const destination = destinations.find((dest) => dest.id === point.destination);
-    return destination?.name || '';
-  }).filter(Boolean);
+  // Получаем уникальные названия пунктов назначения в порядке следования
+  const destinationNames = [];
+  let lastDestinationName = '';
 
-  const route = [...new Set(destinationNames)].join(' — ');
+  points
+    .sort((a, b) => new Date(a.dateFrom) - new Date(b.dateFrom))
+    .forEach((point) => {
+      const destination = destinations.find((dest) => dest.id === point.destination);
+      const currentDestinationName = destination?.name || '';
+
+      // Добавляем только если это первый город или если он отличается от предыдущего
+      if (currentDestinationName && currentDestinationName !== lastDestinationName) {
+        destinationNames.push(currentDestinationName);
+        lastDestinationName = currentDestinationName;
+      }
+    });
+
+  // Формируем маршрут с учетом правила для более чем 3 городов
+  let route = '';
+  if (destinationNames.length === 0) {
+    route = '';
+  } else if (destinationNames.length <= 3) {
+    route = destinationNames.join(' — ');
+  } else {
+    route = `${destinationNames[0]} — ... — ${destinationNames[destinationNames.length - 1]}`;
+  }
 
   let dates = '';
   if (points.length > 0) {

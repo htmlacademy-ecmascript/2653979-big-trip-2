@@ -4,7 +4,7 @@ import ListSortView from '../view/list-sort-view.js';
 import ListEventsView from '../view/list-events-view.js';
 import PointPresenter from '../presenters/point-rpesenter.js';
 import TripInfoView from '../view/trip-info-view.js';
-import NoPointsView from '../view/no-point-view.js';
+import NoPointsView from '../view/no-points-view.js';
 import NewPointButton from '../view/new-point-button.js';
 import UiBlocker from '../framework/ui-blocker/ui-blocker.js';
 
