@@ -146,7 +146,6 @@ function calculateTripInfo(points, destinations, allOffers) {
     return sum + pointTotal;
   }, 0);
 
-  // Получаем уникальные названия пунктов назначения в порядке следования
   const destinationNames = [];
   let lastDestinationName = '';
 
@@ -156,14 +155,12 @@ function calculateTripInfo(points, destinations, allOffers) {
       const destination = destinations.find((dest) => dest.id === point.destination);
       const currentDestinationName = destination?.name || '';
 
-      // Добавляем только если это первый город или если он отличается от предыдущего
       if (currentDestinationName && currentDestinationName !== lastDestinationName) {
         destinationNames.push(currentDestinationName);
         lastDestinationName = currentDestinationName;
       }
     });
 
-  // Формируем маршрут с учетом правила для более чем 3 городов
   let route = '';
   if (destinationNames.length === 0) {
     route = '';
